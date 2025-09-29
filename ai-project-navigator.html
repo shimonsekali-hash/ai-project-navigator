@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מנווט בניית פרויקטים עם AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .progress-bar {
+            background: #f0f0f0;
+            border-radius: 10px;
+            height: 30px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .step {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-right: 5px solid #ddd;
+            transition: all 0.3s ease;
+        }
+        
+        .step.completed {
+            border-right-color: #4caf50;
+            background: #e8f5e9;
+        }
+        
+        .step.active {
+            border-right-color: #667eea;
+            background: #e3f2fd;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        
+        .step.completed .step-number {
+            background: #4caf50;
+        }
+        
+        .step-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .prompt-box {
+            background: #2d2d2d;
+            color: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            direction: ltr;
+            text-align: left;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        button.secondary {
+            background: #4caf50;
+        }
+        
+        button.secondary:hover {
+            background: #45a049;
+        }
+        
+        button.danger {
+            background: #f44336;
+        }
+        
+        button.danger:hover {
+            background: #da190b;
+        }
+        
+        .ai-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .ai-button {
+            flex: 1;
+            padding: 10px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .ai-button.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .check-list {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 10px;
+            border-right: 5px solid #ffc107;
+            margin: 20px 0;
+        }
+        
+        .check-list h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .check-list ul {
+            list-style: none;
+            padding-right: 0;
+        }
+        
+        .check-list li {
+            padding: 8px 0;
+            padding-right: 25px;
+            position: relative;
+        }
+        
+        .check-list li:before {
+            content: "✓";
+            position: absolute;
+            right: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .celebration {
+            text-align: center;
+            font-size: 3em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 מנווט בניית פרויקטים עם AI</h1>
+        <p class="subtitle">אני אדאג שתזכור איפה אתה ומה הצעד הבא</p>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar">0%</div>
+        </div>
+        
+        <div id="stepsContainer"></div>
+        
+        <div id="currentStepDetails" class="hidden">
+            <h2>השלב הנוכחי</h2>
+            <div id="stepContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const projectSteps = [
+            {
+                title: "דף בסיסי עם כותרת",
+                prompt: {
+                    claude: "צור לי קובץ HTML פשוט עם:\n- כותרת ראשית (h1)\n- פסקה קצרה\n- עיצוב בסיסי נקי\n\nשמור על הקוד פשוט וקריא.",
+                    chatgpt: "Create a simple HTML file with:\n- A main heading (h1)\n- A short paragraph\n- Basic clean styling\n\nKeep the code simple and readable.",
+                    gemini: "בנה דף HTML בסיסי עם כותרת ראשית, פסקה קצרה, ועיצוב פשוט."
+                },
+                check: [
+                    "הדף נפתח בדפדפן בלי שגיאות",
+                    "הכותרת מוצגת בבירור",
+                    "הטקסט קריא"
+                ]
+            },
+            {
+                title: "הוספת תמונה וטקסט נוסף",
+                prompt: {
+                    claude: "הוסף לדף הקיים:\n- תמונה (השתמש ב-placeholder מ-https://via.placeholder.com/600x400)\n- 2-3 פסקאות טקסט\n- עצב את התמונה שתיראה טוב\n\nשמור על המבנה נקי.",
+                    chatgpt: "Add to the existing page:\n- An image (use placeholder from https://via.placeholder.com/600x400)\n- 2-3 paragraphs of text\n- Style the image nicely\n\nKeep structure clean.",
+                    gemini: "הוסף תמונה (placeholder) ועוד 2-3 פסקאות לדף. עצב יפה."
+                },
+                check: [
+                    "התמונה נטענת ומוצגת",
+                    "הטקסט מסודר מסביב לתמונה",
+                    "הכל נראה מאוזן"
+                ]
+            },
+            {
+                title: "הוספת כפתור Call-to-Action",
+                prompt: {
+                    claude: "הוסף כפתור CTA בולט:\n- טקסט ברור (למשל: 'התחל עכשיו')\n- עיצוב בולט עם צבעים\n- אפקט hover\n- מרכוז יפה בדף\n\nהכפתור לא צריך לעשות כלום בלחיצה (בינתיים).",
+                    chatgpt: "Add a prominent CTA button:\n- Clear text (e.g., 'Get Started')\n- Bold styling with colors\n- Hover effect\n- Nice centering\n\nButton doesn't need to do anything on click (yet).",
+                    gemini: "הוסף כפתור CTA בולט עם צבעים ואפקט hover. מרכז אותו יפה."
+                },
+                check: [
+                    "הכפתור בולט ומושך את העין",
+                    "יש אפקט כשמעבירים עליו עכבר",
+                    "הוא ממורכז יפה"
+                ]
+            },
+            {
+                title: "עיצוב וצבעים מקצועיים",
+                prompt: {
+                    claude: "שדרג את העיצוב:\n- הוסף פלטת צבעים מקצועית (2-3 צבעים)\n- שפר טיפוגרפיה (גופנים, מרווחים)\n- הוסף רקע מעניין (gradient או צבע)\n- שמור על קריאות\n\nהשתמש בעיצוב מודרני ונקי.",
+                    chatgpt: "Upgrade the design:\n- Add professional color palette (2-3 colors)\n- Improve typography (fonts, spacing)\n- Add interesting background (gradient or color)\n- Maintain readability\n\nUse modern, clean design.",
+                    gemini: "שדרג עיצוב: פלטת צבעים, טיפוגרפיה טובה, רקע יפה. מודרני ונקי."
+                },
+                check: [
+                    "הצבעים מתאימים זה לזה",
+                    "הטקסט קריא על הרקע",
+                    "זה נראה מקצועי"
+                ]
+            },
+            {
+                title: "רספונסיביות למובייל",
+                prompt: {
+                    claude: "הפוך את הדף לרספונסיבי:\n- הוסף media queries למסכים קטנים\n- התאם גדלי טקסט\n- התאם גודל תמונה\n- ודא שהכפתור נראה טוב במובייל\n\nבדוק שזה עובד טוב במסכים של 320px-1920px.",
+                    chatgpt: "Make the page responsive:\n- Add media queries for small screens\n- Adjust text sizes\n- Adjust image size\n- Ensure button looks good on mobile\n\nTest it works well from 320px-1920px screens.",
+                    gemini: "הפוך לרספונסיבי: media queries, התאמות לגדלים שונים, 320px-1920px."
+                },
+                check: [
+                    "הדף נראה טוב על מסך קטן (צמצם חלון)",
+                    "הטקסט לא חותך",
+                    "הכפתור לחיץ בנוח"
+                ]
+            }
+        ];
+
+        let currentStep = 0;
+        let selectedAI = 'claude';
+
+        function init() {
+            const saved = localStorage.getItem('projectProgress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                currentStep = data.currentStep || 0;
+                selectedAI = data.selectedAI || 'claude';
+            }
+            renderSteps();
+            renderCurrentStep();
+        }
+
+        function renderSteps() {
+            const container = document.getElementById('stepsContainer');
+            container.innerHTML = '<h2>השלבים שלך</h2>';
+            
+            projectSteps.forEach((step, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'step';
+                if (index < currentStep) stepDiv.classList.add('completed');
+                if (index === currentStep) stepDiv.classList.add('active');
+                
+                const icon = index < currentStep ? '✅' : (index === currentStep ? '⏳' : '⬜');
+                
+                stepDiv.innerHTML = `
+                    <span class="step-number">${index + 1}</span>
+                    ${icon} <span class="step-title">${step.title}</span>
+                `;
+                
+                container.appendChild(stepDiv);
+            });
+
+            const progress = Math.round((currentStep / projectSteps.length) * 100);
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressBar').textContent = progress + '%';
+        }
+
+        function renderCurrentStep() {
+            if (currentStep >= projectSteps.length) {
+                showCompletion();
+                return;
+            }
+
+            const step = projectSteps[currentStep];
+            const container = document.getElementById('currentStepDetails');
+            const content = document.getElementById('stepContent');
+            
+            container.classList.remove('hidden');
+            
+            content.innerHTML = `
+                <h3>שלב ${currentStep + 1}: ${step.title}</h3>
+                
+                <p><strong>בחר את ה-AI שאיתו אתה עובד עכשיו:</strong></p>
+                <div class="ai-selector">
+                    <div class="ai-button ${selectedAI === 'claude' ? 'selected' : ''}" onclick="selectAI('claude')">
+                        Claude (אתה כאן!)
+                    </div>
+                    <div class="ai-button ${selectedAI === 'chatgpt' ? 'selected' : ''}" onclick="selectAI('chatgpt')">
+                        ChatGPT
+                    </div>
+                    <div class="ai-button ${selectedAI === 'gemini' ? 'selected' : ''}" onclick="selectAI('gemini')">
+                        Gemini
+                    </div>
+                </div>
+                
+                <p><strong>העתק את הפרומפט הזה ל-${selectedAI === 'claude' ? 'Claude' : selectedAI === 'chatgpt' ? 'ChatGPT' : 'Gemini'}:</strong></p>
+                <div class="prompt-box" id="promptBox">${step.prompt[selectedAI]}</div>
+                
+                <div class="button-group">
+                    <button onclick="copyPrompt()">📋 העתק פרומפט</button>
+                </div>
+                
+                <div class="check-list">
+                    <h3>✓ בדוק שזה עובד:</h3>
+                    <ul>
+                        ${step.check.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="button-group">
+                    <button class="secondary" onclick="completeStep()">✅ עבד מעולה! למעבר לשלב הבא</button>
+                    <button class="danger" onclick="showFixPrompt()">❌ לא עבד - תן לי תיקון</button>
+                </div>
+            `;
+        }
+
+        function selectAI(ai) {
+            selectedAI = ai;
+            saveProgress();
+            renderCurrentStep();
+        }
+
+        function copyPrompt() {
+            const promptBox = document.getElementById('promptBox');
+            const text = promptBox.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ הפרומפט הועתק! עכשיו הדבק אותו ב-AI');
+            });
+        }
+
+        function completeStep() {
+            currentStep++;
+            saveProgress();
+            renderSteps();
+            renderCurrentStep();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showFixPrompt() {
+            const step = projectSteps[currentStep];
+            const fixPrompt = `יש בעיה בקוד הקודם. בבקשה:\n1. בדוק את הקוד לשגיאות\n2. תקן את הבעיות\n3. ודא שהכל עובד\n\nהבעיה: הקוד לא עובד כמצופה בשלב "${step.title}"`;
+            
+            document.getElementById('promptBox').textContent = fixPrompt;
+            alert('הפרומפט עודכן לתיקון. העתק והדבק ב-AI שלך.');
+        }
+
+        function showCompletion() {
+            const container = document.getElementById('currentStepDetails');
+            const content = document.getElementById('stepContent');
+            
+            container.classList.remove('hidden');
+            content.innerHTML = `
+                <div class="celebration">🎉🎊🥳</div>
+                <h2 style="text-align: center; color: #4caf50;">כל הכבוד! סיימת!</h2>
+                <p style="text-align: center; font-size: 1.2em; margin: 20px 0;">
+                    בנית אתר נחיתה מושלם צעד אחר צעד!
+                </p>
+                <div class="button-group">
+                    <button onclick="resetProgress()">🔄 התחל פרויקט חדש</button>
+                </div>
+            `;
+        }
+
+        function resetProgress() {
+            if (confirm('האם אתה בטוח? זה ימחק את ההתקדמות הנוכחית')) {
+                currentStep = 0;
+                selectedAI = 'claude';
+                saveProgress();
+                renderSteps();
+                renderCurrentStep();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function saveProgress() {
+            localStorage.setItem('projectProgress', JSON.stringify({
+                currentStep,
+                selectedAI,
+                timestamp: new Date().toISOString()
+            }));
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
